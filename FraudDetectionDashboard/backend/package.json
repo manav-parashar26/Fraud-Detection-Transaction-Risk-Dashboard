@@ -1,0 +1,29 @@
+{
+  "name": "fraud-detection-backend",
+  "version": "1.0.0",
+  "description": "Node.js Express backend API orchestrating the C++ Fraud Detection Engine",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "keywords": [
+    "fraud-detection",
+    "express",
+    "cpp-engine",
+    "graph-analysis",
+    "dsa"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "mongodb-memory-server": "^10.4.3",
+    "mongoose": "^8.24.4",
+    "socket.io": "^4.8.3"
+  }
+}

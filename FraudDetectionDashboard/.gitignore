@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Secrets & Environment variables
+.env
+.env.local
+*.env
+
+# Build outputs
+dist/
+build/
+*.exe
+fraud_engine
+
+# Database storage
+mongo_data/
+mongodb_data/
+data/
+
+# Logs
+logs/
+*.log

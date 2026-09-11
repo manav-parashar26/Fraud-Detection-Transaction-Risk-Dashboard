@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. MongoDB Database Engine
+  # ----------------------------------------------------------------------------
+  mongodb:
+    image: mongo:7.0
+    container_name: fraud_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=fraud_detection
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fraud_network
+
+  # ----------------------------------------------------------------------------
+  # 2. C++ Fraud Engine + Node.js Express Backend API
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fraud_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongodb:27017/fraud_detection
+      - MONGODB_URI=mongodb://mongodb:27017/fraud_detection
+      - CORS_ORIGIN=http://localhost:3000,http://127.0.0.1:3000
+      - FRONTEND_URL=http://localhost:3000
+      - CPP_ENGINE_PATH=/app/fraud-engine/fraud_engine
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - fraud_network
+
+  # ----------------------------------------------------------------------------
+  # 3. React Frontend Dashboard (Vite + Nginx Reverse Proxy)
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fraud_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=/api
+      - VITE_SOCKET_URL=/
+    depends_on:
+      - backend
+    networks:
+      - fraud_network
+
+networks:
+  fraud_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local

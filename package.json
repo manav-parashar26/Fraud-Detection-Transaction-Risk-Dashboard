@@ -1,0 +1,29 @@
+{
+  "name": "fraud-detection-dashboard-monorepo",
+  "version": "1.0.0",
+  "description": "High-performance real-time banking fraud detection system powered by C++17 DSA engine, Node.js API, MongoDB, and React dashboard",
+  "scripts": {
+    "dev:backend": "cd FraudDetectionDashboard/backend && npm run dev",
+    "dev:frontend": "cd FraudDetectionDashboard/frontend && npm run dev",
+    "build:frontend": "cd FraudDetectionDashboard/frontend && npm run build",
+    "build:cpp": "cd FraudDetectionDashboard/fraud-engine && g++ -std=c++17 -Wall -Wextra -Iinclude src/main.cpp src/TransactionGenerator.cpp src/FraudInjector.cpp src/FraudDetector.cpp src/TransactionGraph.cpp src/DSU.cpp src/RiskScorer.cpp src/JsonSerializer.cpp src/StreamSimulator.cpp -o fraud_engine.exe",
+    "test": "cd FraudDetectionDashboard/backend && node tests/verify_phase8.js",
+    "test:db": "cd FraudDetectionDashboard/backend && node tests/verify_db_persistence.js",
+    "docker:up": "cd FraudDetectionDashboard && docker-compose up --build -d",
+    "docker:down": "cd FraudDetectionDashboard && docker-compose down"
+  },
+  "keywords": [
+    "fraud-detection",
+    "cpp17",
+    "dsa",
+    "graph-algorithms",
+    "cycle-detection",
+    "sliding-window",
+    "nodejs",
+    "react",
+    "mongodb",
+    "socketio"
+  ],
+  "author": "Manav",
+  "license": "MIT"
+}
