@@ -5,7 +5,7 @@ import socketService from '../services/socket';
 
 export default function Header({ onAnalysisComplete, onToggleSidebar }) {
   const [engineOnline, setEngineOnline] = useState(true);
-  const [dbConnected, setDbConnected] = useState(false);
+  const [dbConnected, setDbConnected] = useState(null); // null means pending initial API response, avoiding premature "disconnected" state
   const [wsConnected, setWsConnected] = useState(false);
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [monitoringLoading, setMonitoringLoading] = useState(false);
@@ -19,37 +19,41 @@ export default function Header({ onAnalysisComplete, onToggleSidebar }) {
     const checkStatus = async () => {
       try {
         const health = await apiService.getHealth();
-        if (isMounted) {
-          // Backend is connected when health endpoint returns status 'ok' (case-insensitive) or backend 'ok'
-          const isBackendOk = Boolean(
-            health && (
-              (typeof health.status === 'string' && health.status.toLowerCase() === 'ok') ||
-              (typeof health.backend === 'string' && health.backend.toLowerCase() === 'ok')
-            )
-          );
-          setEngineOnline(isBackendOk);
+        if (!isMounted) return;
 
-          // MongoDB availability is tracked separately so disconnected DB does NOT mark Backend disconnected
-          const isDbOk = Boolean(
-            health && (
-              health.databaseConnected === true ||
-              (typeof health.database === 'string' && health.database.toLowerCase() === 'connected')
-            )
-          );
-          setDbConnected(isDbOk);
+        const payload = health?.data || health;
+        if (!payload) return;
 
-          // Track continuous streaming status from health payload
-          if (health) {
-            if (typeof health.monitoringActive === 'boolean') {
-              setIsMonitoring(health.monitoringActive);
-            } else if (typeof health.monitoring === 'string') {
-              setIsMonitoring(health.monitoring.toLowerCase() === 'active');
-            } else if (health.monitoring && typeof health.monitoring.running === 'boolean') {
-              setIsMonitoring(health.monitoring.running);
-            }
-          }
+        // Backend is connected when health endpoint returns status 'ok' (case-insensitive) or backend 'ok'
+        const isBackendOk = Boolean(
+          (typeof payload.status === 'string' && payload.status.toLowerCase() === 'ok') ||
+          (typeof payload.backend === 'string' && payload.backend.toLowerCase() === 'ok') ||
+          payload.backend === true
+        );
+        setEngineOnline(isBackendOk);
+
+        // MongoDB availability: strictly check actual API response
+        // database === "connected" OR databaseConnected === true
+        const isDbOk = Boolean(
+          payload.database === 'connected' ||
+          payload.databaseConnected === true ||
+          (typeof payload.database === 'string' && payload.database.toLowerCase() === 'connected') ||
+          payload.databaseConnected === 'true'
+        );
+
+        setDbConnected(isDbOk);
+
+        // Track continuous streaming status from health payload
+        if (typeof payload.monitoringActive === 'boolean') {
+          setIsMonitoring(payload.monitoringActive);
+        } else if (typeof payload.monitoring === 'string') {
+          const m = payload.monitoring.toLowerCase();
+          setIsMonitoring(m === 'running' || m === 'active');
+        } else if (payload.monitoring && typeof payload.monitoring.running === 'boolean') {
+          setIsMonitoring(payload.monitoring.running);
         }
       } catch (err) {
+        console.error('[Header] Health check failed:', err);
         if (isMounted) {
           setEngineOnline(false);
           setDbConnected(false);
@@ -58,11 +62,19 @@ export default function Header({ onAnalysisComplete, onToggleSidebar }) {
       }
     };
 
+    // Immediate fetch when dashboard loads
     checkStatus();
-    const interval = setInterval(checkStatus, 6000);
+
+    // Responsive periodic refresh (every 2.5s) to detect runtime backend/DB transitions automatically
+    const interval = setInterval(checkStatus, 2500);
+
+    // Refresh immediately when window gains focus
+    window.addEventListener('focus', checkStatus);
+
     return () => {
       isMounted = false;
       clearInterval(interval);
+      window.removeEventListener('focus', checkStatus);
     };
   }, []);
 
@@ -158,10 +170,10 @@ export default function Header({ onAnalysisComplete, onToggleSidebar }) {
         {/* MongoDB Database Status (Reported Separately) */}
         <div
           className={`status-pill ${dbConnected ? 'status-online' : 'status-monitoring-stopped'}`}
-          title={dbConnected ? 'MongoDB connected' : 'MongoDB disconnected (In-Memory fallback active)'}
+          title={dbConnected ? 'MongoDB connected' : (dbConnected === false ? 'MongoDB disconnected (In-Memory fallback active)' : 'Checking MongoDB status...')}
         >
           <span className="status-dot" />
-          <span>MongoDB: {dbConnected ? 'Connected' : 'Disconnected'}</span>
+          <span>MongoDB: {dbConnected === true ? 'Connected' : (dbConnected === false ? 'Disconnected' : 'Checking...')}</span>
         </div>
 
         {/* WebSocket Connection Status (Step 13) */}

@@ -1,6 +1,6 @@
 # Fraud Detection & Transaction Risk Dashboard
 
-> A real-time fraud detection and transaction risk analysis platform powered by a high-performance C++ DSA-based detection engine and a modern full-stack dashboard.
+> Real-time fraud detection and transaction risk dashboard powered by a C++ DSA-based detection engine, Node.js, React, MongoDB, and WebSockets.
 
 [![C++17](https://img.shields.io/badge/C++-17-00599C?logo=cplusplus)](https://en.cppreference.com/w/cpp/17)
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?logo=nodedotjs)](https://nodejs.org/)
@@ -240,8 +240,8 @@ Fraud-Detection-Core/
 
 ### Step 1: Clone Repository
 ```bash
-git clone https://github.com/your-username/fraud-detection-dashboard.git
-cd fraud-detection-dashboard
+git clone https://github.com/manav-parashar26/Fraud-Detection-Transaction-Risk-Dashboard.git
+cd Fraud-Detection-Transaction-Risk-Dashboard
 ```
 
 ### Step 2: Build C++ Fraud Engine

@@ -92,6 +92,10 @@ app.use((req, res, next) => {
 
 // Production Health check endpoint (Step 6)
 app.get('/api/health', (req, res) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+
   const dbConnected = isDatabaseConnected();
   const monitoringRunning = streamManager.getStatus().running;
   const engineAvailable = isEngineAvailable();
@@ -100,7 +104,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     backend: 'ok',
     database: dbConnected ? 'connected' : 'disconnected',
-    monitoring: monitoringRunning ? 'active' : 'stopped',
+    monitoring: monitoringRunning ? 'running' : 'stopped',
     engine: engineAvailable ? 'available' : 'unavailable',
     // Backward-compatible booleans
     databaseConnected: dbConnected,

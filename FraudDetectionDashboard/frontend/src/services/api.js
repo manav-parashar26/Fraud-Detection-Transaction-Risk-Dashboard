@@ -13,7 +13,9 @@ const apiClient = axios.create({
 export const apiService = {
   // Check backend engine connectivity and health
   getHealth: async () => {
-    const res = await apiClient.get('/health');
+    const res = await apiClient.get('/health', {
+      params: { _t: Date.now() }
+    });
     return res.data;
   },
 
