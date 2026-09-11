@@ -268,21 +268,6 @@ npm run test:db
 npm run build:frontend
 ```
 
----
-
-## Screenshots
-
-<!-- Visual demonstration placeholders for repository showcase -->
-| Executive Risk Dashboard | Live Operations Console |
-|:---:|:---:|
-| ![Executive Risk Dashboard](https://via.placeholder.com/600x340/0f172a/38bdf8?text=Executive+Risk+Dashboard) | ![Live Operations Console](https://via.placeholder.com/600x340/0f172a/10b981?text=Live+Operations+Stream) |
-
-| Topological Fraud Networks | Historical Transaction Ledger |
-|:---:|:---:|
-| ![Topological Fraud Networks](https://via.placeholder.com/600x340/0f172a/8b5cf6?text=Topological+Fraud+Networks) | ![Historical Transaction Ledger](https://via.placeholder.com/600x340/0f172a/f59e0b?text=Historical+Transaction+Ledger) |
-
----
-
 ## Future Improvements
 
 - **Machine Learning Integration**: Complementing rule-based weights with Isolation Forests and Autoencoders for unsupervised novelty detection.
